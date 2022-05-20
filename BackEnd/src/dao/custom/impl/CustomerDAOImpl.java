@@ -37,7 +37,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public boolean save(Customer customer, DataSource dataSource) throws SQLException, ClassNotFoundException {
-        return CrudUtil.executeUpdate(dataSource,"INSERT INTO ITEM VALUES(?,?,?,?)",customer.getCusId(),customer.getCusName(),customer.getCusAddress(),
+        return CrudUtil.executeUpdate(dataSource,"INSERT INTO Customer VALUES(?,?,?,?)",customer.getCusId(),customer.getCusName(),customer.getCusAddress(),
                 customer.getCusContact());
     }
 

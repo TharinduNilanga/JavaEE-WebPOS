@@ -52,7 +52,7 @@ public class customerServlet extends HttpServlet {
                    all = customerBO.getAllCustomer(dataSource);
                     for (CustomerDTO customer : all) {
                         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        objectBuilder.add("cuId",customer.getCusId());
+                        objectBuilder.add("cusId",customer.getCusId());
                         objectBuilder.add("cusName",customer.getCusName());
                         objectBuilder.add("cusAddress",customer.getCusAddress());
                         objectBuilder.add("cusContact",customer.getCusContact());
@@ -103,12 +103,12 @@ public class customerServlet extends HttpServlet {
                     writer.print(objectBuilder.build());
                 }
                 break;
-            case "GENERATECUSTOMERID":
+            case "GENERATEID":
                 try {
                     String id = customerBO.generateNewID(dataSource);
                     if (id != null) {
                         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        objectBuilder.add("customerId", id);
+                        objectBuilder.add("cusId", id);
                         objectBuilder.add("status", 200);
                         objectBuilder.add("data", "");
                         objectBuilder.add("message", "Customer id generated successfully");
@@ -155,6 +155,7 @@ public class customerServlet extends HttpServlet {
                 objectBuilder.add("message", "Customer saved successfully");
                 writer.print(objectBuilder.build());
                 dataSource.getConnection().close();
+                System.out.println(objectBuilder.build());
             }else{
                 objectBuilder.add("status", 400);
                 objectBuilder.add("data", "");

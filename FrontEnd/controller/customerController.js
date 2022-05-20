@@ -14,45 +14,24 @@ txtCusId.val(generateCustomerId());
 
 
     function generateCustomerId() {
-        if (customerDB[0] != undefined) {
-            for (let i = 0; i < customerDB.length; i++) {
-                if (i == (customerDB.length - 1)) {
-                    let temp = parseInt(customerDB[i].getCustomerId().split('-')[1]);
-                    temp = temp + 1;
-                    if (temp <= 9) {
-                        return "C00-00" + temp;
-                    } else if (temp <= 99) {
-                        return "C00-0" + temp;
-                    } else {
-                        return "C00-" + temp;
-                    }
+        $.ajax({
+            url: "http://localhost:8080/BackEnd_Web_exploded/customer?option=GETALL",
+            method: "GET",
+            // dataType:"json", // please convert the response into JSON
+            success: function (resp) {
+
+                console.log(typeof resp);
+
+                for (const customer of resp.data) {
+                    let row='<tr><td>'+customer.id+'</td><td>'+customer.name+'</td><td>'+customer.address+'</td><td>'+customer.contact+'</td></tr>';
+                    $("#tblCustomer").append(row);
                 }
+                bindClickEvents();
             }
-        } else {
-            return "C00-001";
-        }
+        });
     }
     btnSaveCustomer.click(function () {
-        for (let i = 0; i < customerDB.length; i++) {
-            if (customerDB[i].getCustomerId() == txtCusId.val()) {
-                alert('This Id is Exists.Enter Different..');
-                clearTextFields();
-                txtCusId.val(generateCustomerId());
-                return;
-            }
-        }
-        if (customerDB.push(new customerDTO(txtCusId.val(),txtCusName.val(),txtCusAddress.val(),txtCusContact.val()))) {
-            alert("Customer Details Added Succesfully!.")
-            clearTextFields();
-            $('#btnSaveCustomer').prop('disabled', true);
-            let i = generateCustomerId();
-            txtCusId.val(i);
-            setDataToTable();
-            btnUpdateCustomer.prop('disabled', false);
-            btnDeleteCustomer.prop('disabled', false);
-        }else{
-            alert("error")
-        }
+
     });
 
     function  clearTextFields(){
