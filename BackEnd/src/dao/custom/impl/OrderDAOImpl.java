@@ -23,11 +23,11 @@ public class OrderDAOImpl implements OrderDAO  {
 
     @Override
     public String generateNewID(DataSource dataSource) throws SQLException, ClassNotFoundException {
-        ResultSet rst = CrudUtil.executeQuery(dataSource,"SELECT oId FROM `Order` ORDER BY orderId DESC LIMIT 1;;");
+        ResultSet rst = CrudUtil.executeQuery(dataSource,"SELECT oId FROM `Order` ORDER BY oId DESC LIMIT 1;");
         if (rst.next()) {
             String id = rst.getString("orderId");
             int newOrderId = Integer.parseInt(id.replace("O", "")) + 1;
-            return String.format("O%03d",  newOrderId);
+            return String.format("O%03d",  newOrderId+1);
         } else {
             return "O001";
         }

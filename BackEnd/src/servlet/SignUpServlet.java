@@ -34,13 +34,18 @@ public class SignUpServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
-
+        resp.setContentType("application/json");
         try {
             String userName = req.getParameter("userName");
+            System.out.println(userName);
+
             SignUpDTO signUpDTO = null;
             try {
+                System.out.println("ok");
                 signUpDTO = signUpBO.search(dataSource,userName);
+                System.out.println(signUpDTO.getUserName());
                 if (signUpDTO != null) {
+                    System.out.println(signUpDTO.getUserName());
                     resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                     objectBuilder.add("userName",signUpDTO.getUserName());
                     objectBuilder.add("email",signUpDTO.getEmail());
@@ -59,6 +64,7 @@ public class SignUpServlet extends HttpServlet {
                     writer.print(objectBuilder.build());
                 }
             } catch (SQLException | ClassNotFoundException throwables) {
+                System.out.println("error");
                 throwables.printStackTrace();
                 resp.setStatus(200);
                 objectBuilder.add("status", 500);
@@ -68,6 +74,7 @@ public class SignUpServlet extends HttpServlet {
             }
             dataSource.getConnection().close();
         } catch (SQLException throwables) {
+            System.out.println("error");
             throwables.printStackTrace();
         }
     }
@@ -79,7 +86,7 @@ public class SignUpServlet extends HttpServlet {
         String userName = jsonObject.getString("userName");
         String email = jsonObject.getString("email");
         String password = jsonObject.getString("password");
-
+        resp.setContentType("application/json");
 
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();

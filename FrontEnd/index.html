@@ -279,9 +279,9 @@
                     <p id="errorI3" style="color: #ff253a ; font-size: 10px"></p>
 
                     <div class="row" id="itemadd">
-                        <div class="col"> <button class="btn btn-success me-5" id="btnItemSave" disabled>Save</button></div>
-                        <div class="col"> <button class="btn btn-success me-5" id="btnUpdateItem">Update</button></div>
-                        <div class="col"> <button class="btn btn-danger " id="btnDeleteItem">Delete</button></div>
+                        <div class="col"> <button type="button" class="btn btn-success me-5" id="btnItemSave" disabled>Save</button></div>
+                        <div class="col"> <button type="button" class="btn btn-success me-5" id="btnUpdateItem">Update</button></div>
+                        <div class="col"> <button type="button" class="btn btn-danger " id="btnDeleteItem">Delete</button></div>
                     </div>
                 </div>
                 <div class="col">
@@ -303,7 +303,7 @@
                     <th scope="col">Item code</th>
                     <th scope="col">Name</th>
                     <th scope="col">Price</th>
-                    <th scope="col">Quatity</th>
+                    <th scope="col">Quantity</th>
                 </tr>
                 </thead>
                 <tbody id="tblItem">
@@ -359,6 +359,7 @@
         <div id="div2">
             <div class="row">
                 <div class="col-5" id="col5" >
+                    <form id="customerForm">
                     <h4 class="text-secondary" id="customerHead">Customers</h4>
                     <input class="form-control form-control-sm mt-3"   name="txtCustomerId" id="txtCustomerId" placeholder="Id" type="text" style="box-shadow: none" >
                     <p id="error" style="color: #ff253a ; font-size: 10px"></p>
@@ -370,10 +371,11 @@
                     <p id="error3" style="color: #ff253a ; font-size: 10px"></p>
 
                     <div class="row" id="customeradd">
-                        <div class="col"> <button class="btn btn-success me-5" id="btnSaveCustomer" disabled>Save</button></div>
-                        <div class="col"> <button class="btn btn-success me-5" id="btnUpdateCustomer"  disabled>Update</button></div>
-                        <div class="col"> <button class="btn btn-danger " id="btnDeleteCustomer"  disabled>Delete</button></div>
+                        <div class="col"> <button type="button" class="btn btn-success me-5" id="btnSaveCustomer" disabled>Save</button></div>
+                        <div class="col"> <button type="button"  class="btn btn-success me-5" id="btnUpdateCustomer"  >Update</button></div>
+                        <div class="col"> <button type="button"  class="btn btn-danger " id="btnDeleteCustomer"  >Delete</button></div>
                     </div>
+                    </form>
                 </div>
                 <div class="col">
 
@@ -511,7 +513,7 @@
                 <div class="col">
                     <div class="row" id="row1" >
                         <div class="col">
-                            <label for="loginexampleInputEmail1" class="form-label">Email address</label>
+                            <label for="loginexampleInputEmail1" class="form-label">User Name</label>
                             <input type="email" class="form-control" id="loginexampleInputEmail1" aria-describedby="emailHelp">
                         </div>
                     </div>
@@ -574,20 +576,22 @@
 </main>
 <script src="assets/boostrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/jQuery/jquery-3.6.0.min.js"></script>
-<script src="db/db.js"></script>
+<!--<script src="db/db.js"></script>-->
 <script src="assets/js/script.js"></script>
-<script src="model/customerDTO.js"></script>
+<script src="assets/js/AddToCart.js"></script>
+<!--<script src="model/customerDTO.js"></script>
 <script src="model/itemDTO.js"></script>
 <script src="model/orderDTO.js"></script>
-<script src="model/tm/AddToCart.js"></script>
+
 <script src="model/orderDetails.js"></script>
-<script src="model/signUp.js"></script>
-<script src="controller/customerController.js"></script>
-<script src="controller/itemController.js"></script>
+<script src="model/signUp.js"></script>-->
+<!--<script src="controller/customerController.js"></script>-->
+<!--<script src="controller/itemController.js"></script>-->
 <script src="controller/homeController.js"></script>
-<script src="controller/loginController.js"></script>
+
+<!--<script src="controller/loginController.js"></script>
 <script src="controller/orderDetailsController.js"></script>
-<script src="controller/signupController.js"></script>
+<script src="controller/signupController.js"></script>-->
 
 
 

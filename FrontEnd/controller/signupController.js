@@ -5,23 +5,27 @@ var password=$('#exampleInputPassword');
 var confirm=$('#Confirm');
 
     confirm.click(function () {
-        for (let i=0;i<signUpDB.length;i++){
-            if (signUpDB[0].getEmail()==Email.val()){
-                alert("This EMail Address is Exists.Enter Another...");
-                return;
-            }
-        }
-        alert("yes")
-        console.log(password.val())
+        let details={
 
-        if (signUpDB.push(new signUp(Email.val(),userName.val(),password.val()))){
-            alert("User has been added...")
-            Email.val("");
-            userName.val("");
-            password.val("");
-        }else{
-            alert("Error...");
-        };
+            userName:userName.val(),
+            email:Email.val(),
+            password:password.val()
+        }
+        $.ajax({
+            url:"http://localhost:8080/BackEnd_Web_exploded/signUp",
+            method:"POST",
+            dataType:"json",
+            contentType:"application/json",
+            data:JSON.stringify(details),
+            success:function (resp) {
+                if (resp.status==200){
+                    alert(resp.message)
+
+                }else {
+                    alert(resp.data)
+                }
+            }
+        })
 
     });
 

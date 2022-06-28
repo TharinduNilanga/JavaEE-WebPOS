@@ -26,6 +26,7 @@ import java.util.ArrayList;
  * @created 5/20/2022
  */
 @WebServlet(urlPatterns = "/customer")
+
 public class customerServlet extends HttpServlet {
 
 
@@ -42,6 +43,9 @@ public class customerServlet extends HttpServlet {
         String option = req.getParameter("option");
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
 
+        resp.setContentType("application/json");
+
+
         PrintWriter writer = resp.getWriter();
         switch (option){
             case "GETALL":
@@ -52,10 +56,10 @@ public class customerServlet extends HttpServlet {
                    all = customerBO.getAllCustomer(dataSource);
                     for (CustomerDTO customer : all) {
                         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                        objectBuilder.add("cusId",customer.getCusId());
-                        objectBuilder.add("cusName",customer.getCusName());
-                        objectBuilder.add("cusAddress",customer.getCusAddress());
-                        objectBuilder.add("cusContact",customer.getCusContact());
+                        objectBuilder.add("id",customer.getCusId());
+                        objectBuilder.add("name",customer.getCusName());
+                        objectBuilder.add("address",customer.getCusAddress());
+                        objectBuilder.add("contact",customer.getCusContact());
                         arrayBuilder.add(objectBuilder.build());
                     }
                     JsonObjectBuilder response = Json.createObjectBuilder();
@@ -74,8 +78,10 @@ public class customerServlet extends HttpServlet {
             case "SEARCH":
                 String customerId = req.getParameter("cusId");
                 CustomerDTO customerDTO = null;
+                System.out.println(customerId);
                 try {
                     customerDTO = customerBO.search(dataSource,customerId);
+                    System.out.println(customerId);
                     if (customerDTO != null) {
                         resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                         objectBuilder.add("cusId",customerDTO.getCusId());
@@ -104,14 +110,17 @@ public class customerServlet extends HttpServlet {
                 }
                 break;
             case "GENERATEID":
+
                 try {
                     String id = customerBO.generateNewID(dataSource);
+                    System.out.println(id);
                     if (id != null) {
-                        resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                        resp.setStatus(HttpServletResponse.SC_OK);
                         objectBuilder.add("cusId", id);
                         objectBuilder.add("status", 200);
                         objectBuilder.add("data", "");
                         objectBuilder.add("message", "Customer id generated successfully");
+
                         writer.print(objectBuilder.build());
                     } else {
                         objectBuilder.add("status", 400);
@@ -140,22 +149,29 @@ public class customerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
-        String cusId = jsonObject.getString("cusId");
-        String cusName = jsonObject.getString("cusName");
-        String address = jsonObject.getString("cusAddress");
-        String cusContact = jsonObject.getString("cusContact");
-
+        String cusId = jsonObject.getString("id");
+        String cusName = jsonObject.getString("name");
+        String address = jsonObject.getString("address");
+        String cusContact = jsonObject.getString("contact");
+        resp.setContentType("application/json");
+        System.out.println(cusId+cusName+address+cusContact);
+      /*  String cusId =req.getParameter("txtCustomerId");
+        String cusName =req.getParameter("txtCustomerName");
+        String address =  req.getParameter("txtCustomerAddress");
+        String cusContact =req.getParameter("txtCustomerContact");
+        System.out.println(cusId+cusName+address+cusContact);*/
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
+
         try {
             if (customerBO.addCustomer(dataSource,new CustomerDTO(cusId,cusName,address,cusContact))){
-                resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                resp.setStatus(HttpServletResponse.SC_OK);
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");
                 objectBuilder.add("message", "Customer saved successfully");
                 writer.print(objectBuilder.build());
                 dataSource.getConnection().close();
-                System.out.println(objectBuilder.build());
+               // System.out.println(objectBuilder.build());
             }else{
                 objectBuilder.add("status", 400);
                 objectBuilder.add("data", "");
@@ -169,17 +185,18 @@ public class customerServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String cusId = req.getParameter("cusId");
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+        resp.setContentType("application/json");
         PrintWriter writer = resp.getWriter();
         try {
             if (customerBO.deleteCustomer(dataSource,cusId)){
-                resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                System.out.println("ok");
+                resp.setStatus(HttpServletResponse.SC_OK);
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");
                 objectBuilder.add("message", "Customer Delete");
@@ -214,16 +231,18 @@ public class customerServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
-        String cusId = jsonObject.getString("cusId");
-        String cusName = jsonObject.getString("cusName");
-        String address = jsonObject.getString("cusAddress");
-        String cusContact = jsonObject.getString("cusContact");
+        String cusId = jsonObject.getString("id");
+        String cusName = jsonObject.getString("name");
+        String address = jsonObject.getString("address");
+        String cusContact = jsonObject.getString("contact");
+        System.out.println(cusId+cusName+address+cusContact);
+        resp.setContentType("application/json");
 
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
         try {
             if (customerBO.updateCustomer(dataSource,new CustomerDTO(cusId,cusName,address,cusContact))){
-                resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                resp.setStatus(HttpServletResponse.SC_OK);
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");
                 objectBuilder.add("message", "Customer Updated");

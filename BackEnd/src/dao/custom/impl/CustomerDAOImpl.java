@@ -22,11 +22,11 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public String generateNewID(DataSource dataSource) throws SQLException, ClassNotFoundException {
-        ResultSet rst = CrudUtil.executeQuery(dataSource, "SELECT cusId FROM Customer ORDER BY cusId DESC LIMIT -1");
+        ResultSet rst = CrudUtil.executeQuery(dataSource, "SELECT cusId FROM Customer ORDER BY cusId DESC LIMIT 1");
         if (rst.next()) {
             String id = rst.getString("cusId");
             int newId = Integer.parseInt(id.replace("C", ""));
-            return String.format("C%03d",newId);
+            return String.format("C%03d",newId+1);
         }else {
             return "C001";
         }
@@ -64,7 +64,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
     @Override
     public Customer search(String s, DataSource dataSource) throws SQLException, ClassNotFoundException {
-        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM Customer WHERE cusId=?");
+        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM Customer WHERE cusId=?",s);
         set.next();
         return new Customer(s,set.getString("cusName"),
                 set.getString("cusAddress"),

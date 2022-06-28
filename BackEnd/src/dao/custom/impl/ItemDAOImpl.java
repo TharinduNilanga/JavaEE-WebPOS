@@ -22,11 +22,11 @@ public class ItemDAOImpl implements ItemDAO {
 
     @Override
     public String generateNewID(DataSource dataSource) throws SQLException, ClassNotFoundException {
-        ResultSet rst = CrudUtil.executeQuery(dataSource, "SELECT itemId FROM Customer ORDER BY itemId DESC LIMIT -1");
+        ResultSet rst = CrudUtil.executeQuery(dataSource, "SELECT itemId FROM Item ORDER BY itemId DESC LIMIT 1");
         if (rst.next()) {
             String id = rst.getString("itemId");
             int newId = Integer.parseInt(id.replace("I", ""));
-            return String.format("I%03d",newId);
+            return String.format("I%03d",newId+1);
         }else {
             return "I001";
         }
@@ -54,7 +54,7 @@ public class ItemDAOImpl implements ItemDAO {
     @Override
     public ArrayList<Item> getAll(DataSource dataSource) throws SQLException, ClassNotFoundException {
         ArrayList<Item> allItem=new ArrayList();
-        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM Customer");
+        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM Item");
         while (set.next()) {
            allItem.add(new Item(set.getString("itemId"),
                     set.getString("itemName"),set.getDouble("itemPrice"),
@@ -65,7 +65,7 @@ public class ItemDAOImpl implements ItemDAO {
 
     @Override
     public Item search(String s, DataSource dataSource) throws SQLException, ClassNotFoundException {
-        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM Item WHERE itemId=?");
+        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM Item WHERE itemId=?",s);
         set.next();
         return new Item(s,set.getString("itemName"),
                 set.getDouble("itemPrice"),

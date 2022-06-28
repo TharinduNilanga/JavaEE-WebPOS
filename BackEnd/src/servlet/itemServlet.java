@@ -36,6 +36,7 @@ public class itemServlet extends HttpServlet {
             JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
 
             PrintWriter writer = resp.getWriter();
+            resp.setContentType("application/json");
             switch (option){
                 case "GETALL":
                     JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
@@ -45,10 +46,10 @@ public class itemServlet extends HttpServlet {
                         all = itemBO.getAllItems(dataSource);
                         for (ItemDTO itemDTO : all) {
                             resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                            objectBuilder.add("itemId",itemDTO.getItemId());
-                            objectBuilder.add("itemName",itemDTO.getItemName());
-                            objectBuilder.add("itemPrice",itemDTO.getItemPrice());
-                            objectBuilder.add("itemQuantity",itemDTO.getItemQuantity());
+                            objectBuilder.add("id",itemDTO.getItemId());
+                            objectBuilder.add("name",itemDTO.getItemName());
+                            objectBuilder.add("price",itemDTO.getItemPrice());
+                            objectBuilder.add("qty",itemDTO.getItemQuantity());
                             arrayBuilder.add(objectBuilder.build());
                         }
                         JsonObjectBuilder response = Json.createObjectBuilder();
@@ -70,7 +71,7 @@ public class itemServlet extends HttpServlet {
                     try {
                         itemDTO = itemBO.search(dataSource, itemId);
                         if (itemDTO != null) {
-                            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                            resp.setStatus(HttpServletResponse.SC_OK);
                             objectBuilder.add("itemId",itemDTO.getItemId());
                             objectBuilder.add("itemName",itemDTO.getItemName());
                             objectBuilder.add("itemPrice",itemDTO.getItemPrice());
@@ -133,12 +134,13 @@ public class itemServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
-        String itemId = jsonObject.getString("itemId");
-        String itemName = jsonObject.getString("itemName");
-        double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
-        int itemQuantity = Integer.parseInt(jsonObject.getString("itemQuantity"));
+        String itemId = jsonObject.getString("id");
+        String itemName = jsonObject.getString("name");
+        double itemPrice = Double.parseDouble(jsonObject.getString("price"));
+        int itemQuantity = Integer.parseInt(jsonObject.getString("qty"));
 
-
+        resp.setContentType("application/json");
+        System.out.println(itemId+itemName+itemPrice+itemQuantity);
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
         try {
@@ -166,19 +168,19 @@ public class itemServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException , IOException {
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
-        String itemId = jsonObject.getString("itemId");
-        String itemName = jsonObject.getString("itemName");
-        double itemPrice = Double.parseDouble(jsonObject.getString("itemPrice"));
-        int itemQuantity = Integer.parseInt(jsonObject.getString("itemQuantity"));
-
+        String itemId = jsonObject.getString("id");
+        String itemName = jsonObject.getString("name");
+        double itemPrice = Double.parseDouble(jsonObject.getString("price"));
+        int itemQuantity = Integer.parseInt(jsonObject.getString("qty"));
+        resp.setContentType("application/json");
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
         try {
             if (itemBO.updateItem(dataSource,new ItemDTO(itemId,itemName,itemPrice,itemQuantity))){
-                resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+                resp.setStatus(HttpServletResponse.SC_OK);
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");
                 objectBuilder.add("message", "Item Updated");
@@ -214,6 +216,7 @@ public class itemServlet extends HttpServlet {
         String itemId = req.getParameter("itemId");
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
+        resp.setContentType("application/json");
         try {
             if (itemBO.deleteItem(dataSource,itemId)){
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);

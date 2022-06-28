@@ -3,11 +3,12 @@
     <Resource
             name="jdbc/pool"
             type="javax.sql.DataSource"
-            driverClassName="com.mysql.jdbc.Driver"
+            driverClassName="com.mysql.cj.jdbc.Driver"
             url="jdbc:mysql://127.0.0.1:3306/SPA"
             username="root"
             password="1234"
-            maxTotal="5"
-            initialSize="5"
+            maxTotal="20"
+            initialSize="20"
     ></Resource>
+
 </Context>

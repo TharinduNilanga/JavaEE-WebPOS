@@ -5,6 +5,7 @@ import bo.custom.OrderBO;
 import bo.custom.OrderDetailsBO;
 import dto.CustomerDTO;
 import dto.OrderDTO;
+import dto.OrderDetailsDTO;
 import entity.Order;
 import entity.OrderDetails;
 import entity.SignUp;
@@ -42,7 +43,7 @@ public class orderServlet extends HttpServlet {
         try {
             String option = req.getParameter("option");
             JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-
+            resp.setContentType("application/json");
             PrintWriter writer = resp.getWriter();
             switch (option){
                 case "GETALL":
@@ -52,6 +53,7 @@ public class orderServlet extends HttpServlet {
                     try {
                         all = orderBO.getAllOrder(dataSource);
                         for (OrderDTO orderDTO : all) {
+
                             resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                             objectBuilder.add("oId",orderDTO.getoId());
                             objectBuilder.add("cusId",orderDTO.getCusId());
@@ -77,9 +79,11 @@ public class orderServlet extends HttpServlet {
                 case "GENERATEID":
                     try {
                         String id = orderBO.generateNewOrderId(dataSource);
+                        System.out.println(id);
                         if (id != null) {
-                            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
-                            objectBuilder.add("cusId", id);
+                            System.out.println(id);
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            objectBuilder.add("id", id);
                             objectBuilder.add("status", 200);
                             objectBuilder.add("data", "");
                             objectBuilder.add("message", "Order id generated successfully");
@@ -117,12 +121,37 @@ public class orderServlet extends HttpServlet {
         double totalPrice = Double.parseDouble(jsonObject.getString("totalPrice"));
         LocalDate date = LocalDate.parse(jsonObject.getString("date"));
         LocalTime time = LocalTime.parse(jsonObject.getString("time"));
+        //////
+        JsonArray orderDetails = jsonObject.getJsonArray("orderDetails");
 
+        ArrayList<OrderDetailsDTO> getOrderDetails = new ArrayList<>();
+
+
+        for (int i = 0; i < orderDetails.size(); i++) {
+            getOrderDetails.add(new OrderDetailsDTO(
+                    orderDetails.getJsonObject(i).getString("oId"),
+                    orderDetails.getJsonObject(i).getString("cusId"),
+                    orderDetails.getJsonObject(i).getString("itemId"),
+                    Integer.parseInt(orderDetails.getJsonObject(i).getString("discount")),
+                    Integer.parseInt(orderDetails.getJsonObject(i).getString("quantity")),
+                    Double.parseDouble(orderDetails.getJsonObject(i).getString("totalPrice"))
+                    ));
+        }
+
+        System.out.println(oId);
+        System.out.println(cusId);
+        System.out.println(discount);
+        System.out.println(totalPrice);
+        System.out.println(date);
+        System.out.println(time);
+        //System.out.println(oId);
+
+        resp.setContentType("application/json");
 
         JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         PrintWriter writer = resp.getWriter();
         try {
-            if (orderBO.purchaseOrder(dataSource,new OrderDTO(oId,cusId,discount,totalPrice,date,time))){
+            if (orderBO.purchaseOrder(dataSource,new OrderDTO(oId,cusId,discount,totalPrice,date,time,getOrderDetails))){
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
                 objectBuilder.add("status", 200);
                 objectBuilder.add("data", "");

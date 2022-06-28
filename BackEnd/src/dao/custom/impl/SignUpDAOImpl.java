@@ -1,10 +1,12 @@
 package dao.custom.impl;
 
 import dao.custom.SignUpDAO;
+import entity.Customer;
 import entity.SignUp;
 import util.CrudUtil;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -46,6 +48,9 @@ public class SignUpDAOImpl implements SignUpDAO {
 
     @Override
     public SignUp search(String s, DataSource dataSource) throws SQLException, ClassNotFoundException {
-        return null;
+        ResultSet set = CrudUtil.executeQuery(dataSource, "SELECT * FROM SignUp WHERE userName=?");
+        set.next();
+        return new SignUp(set.getString("userName"),set.getString("email"),set.getString("password"));
+
     }
 }

@@ -18,7 +18,7 @@ var SignUpbtn=document.getElementById("btnSignUp");
 var SignUpbtn1=document.getElementById("SignUpbtn1");
 var btnSearchOrderDetails=$('#btnOrderDetailsSearch');
 
-/*loginbtn.addEventListener("click",function () {
+loginbtn.addEventListener("click",function () {
     homeSection.style.display="block";
     itemSection.style.display="none";
     customerSection.style.display="none";
@@ -28,7 +28,7 @@ var btnSearchOrderDetails=$('#btnOrderDetailsSearch');
     headerNav.style.display="block";
     OrderDetailsAllSection.style.display="none";
 
-})*/
+})
 loginNav.addEventListener("click",function () {
     homeSection.style.display="none";
     itemSection.style.display="none";

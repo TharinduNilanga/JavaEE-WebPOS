@@ -9,11 +9,65 @@ var txtCusAddress=$('#txtCustomerAddress');
 var txtCusContact=$('#txtCustomerContact');
 var txtSearchCustomerId=$('#txtSearchCustomerId');
 var customerTable=$('#tblCustomerTable')
+
+
 txtCusId.val(generateCustomerId());
 
 
 
     function generateCustomerId() {
+      $.ajax({
+          url:"http://localhost:8080/BackEnd_Web_exploded/customer?option=GENERATEID",
+          method:"GET",
+          success:function (resp) {
+
+              if (resp.status==200){
+                  console.log(resp.cusId)
+                  txtCusId.val(resp.cusId)
+              }else {
+                  alert(resp.data)
+              }
+
+          }
+      })
+    }
+    btnSaveCustomer.click(function () {
+       // var data=$('#customerForm').serialize();
+        var detail={
+            id:txtCusId.val(),
+            name:txtCusName.val(),
+            address:txtCusAddress.val(),
+            contact:txtCusContact.val()
+        }
+        $.ajax({
+            url: "http://localhost:8080/BackEnd_Web_exploded/customer",
+            method: "POST",
+            data:JSON.stringify(detail),
+            content:"application/json",
+            dataType:"json",
+            success:function (res) {
+                if (res.status==200){
+
+                    alert(res.message);
+                    setDataToTable();
+                    clearTextFields();
+                }else {
+                    alert(res.data)
+                }
+
+            }
+        })
+    });
+
+    function  clearTextFields(){
+        $('#txtCustomerId').val("");
+        $('#txtCustomerName').val("");
+        $('#txtCustomerAddress').val("");
+        $('#txtCustomerContact').val("");
+    }
+    setDataToTable();
+    function setDataToTable(){
+        $('#tblCustomer').empty();
         $.ajax({
             url: "http://localhost:8080/BackEnd_Web_exploded/customer?option=GETALL",
             method: "GET",
@@ -26,46 +80,27 @@ txtCusId.val(generateCustomerId());
                     let row='<tr><td>'+customer.id+'</td><td>'+customer.name+'</td><td>'+customer.address+'</td><td>'+customer.contact+'</td></tr>';
                     $("#tblCustomer").append(row);
                 }
-                bindClickEvents();
+            bindClickEvents();
             }
         });
     }
-    btnSaveCustomer.click(function () {
+        function bindClickEvents() {
+            $("#tblCustomer>tr").click(function () {
+                //Get values from the selected row
+                let id = $(this).children().eq(0).text();
+                let name = $(this).children().eq(1).text();
+                let address = $(this).children().eq(2).text();
+                let contact = $(this).children().eq(3).text();
 
-    });
+                //Set values to the text-fields
 
-    function  clearTextFields(){
-        $('#txtCustomerId').val("");
-        $('#txtCustomerName').val("");
-        $('#txtCustomerAddress').val("");
-        $('#txtCustomerContact').val("");
-    }
-    function setDataToTable(){
-        $("#tblCustomerTable tbody tr").remove();
-        for (let i=0;i<customerDB.length;i++){
-            var tr='<tr><td>'+customerDB[i].getCustomerId()+'</td> <td>'+customerDB[i].getCustomerName()+'</td> <td>'+customerDB[i].getCustomerAddress()+'</td> <td>'+customerDB[i].getCustomerContact()+'</td></tr>';
-            $("#tblCustomer").append(tr);
+                $('#txtCustomerId').val(id);
+                $('#txtCustomerName').val(name);
+                $('#txtCustomerAddress').val(address);
+                $('#txtCustomerContact').val(contact);
+            });
         }
-    }
 
-/*    $(document).ready(function () {
-        $(document).on('click','#tblCustomerTable tbody tr',function () {
-            var cusId=$(this).find('td:eq(0)').text();
-            var name=$(this).find('td:eq(1)').text();
-            var  address=$(this).find('td:eq(2)').text();
-            var  contact=$(this).find('td:eq(3)').text();
-
-
-            $('#txtCustomerId').val(cusId);
-            $('#txtCustomerName').val(name);
-            $('#txtCustomerAddress').val(address);
-            $('#txtCustomerContact').val(contact);
-
-        });
-        $(document).on('dblclick','#tblCustomerTable tbody tr',function () {
-            $(this).remove();
-        });
-    });*/
 
     $("#txtCustomerId").focus();
     $("#txtCustomerId").keydown(function (event) {
@@ -201,66 +236,60 @@ txtCusId.val(generateCustomerId());
 
     })
     function searchCustomer(id) {
-        for (let i=0;i<customerDB.length;i++){
-            if (customerDB[i].getCustomerId()==id){
-                return customerDB[i];
+        $.ajax({
+            url:"http://localhost:8080/BackEnd_Web_exploded/customer?option=SEARCH?cusId="+id,
+            method:"SEARCH",
+            success: function (resp) {
+                var details=resp.cusId;
+                return details;
             }
-        }
+        });
 
     }
     btnUpdateCustomer.click(function () {
-        /*let id=txtCusId.val();*/
+        var cusOb={
+            id:txtCusId.val(),
+            name:txtCusName.val(),
+            address:txtCusAddress.val(),
+            contact:txtCusContact.val()
+        }
+        $.ajax({
+            url:"http://localhost:8080/BackEnd_Web_exploded/customer",
+            method:"PUT",
+            contentType:"application/json",
+            data:JSON.stringify(cusOb),
+            success:function (resp) {
+                    if (resp.status==200){
+                        alert(resp.message);
+                        setDataToTable();
 
-        for (let i=0;i<customerDB.length;i++){
-            if (customerDB[i].getCustomerId()==txtCusId.val()){
-                customerDB[i].setCustomerName(txtCusName.val());
-                customerDB[i].setCustomerAddress(txtCusAddress.val());
-                customerDB[i].setCustomerContact(txtCusContact.val());
-                alert("Customer Have been Updated")
-                setDataToTable();
-                clearTextFields();
-                txtCusId.val(generateCustomerId());/* $("#tblCustomerTable tbody tr").filter(function() {
-
-                    if ($(this).children("td:nth-child(1)").text() == customerDB[i].getCustomerId()) {
-                        $(this).replaceWith('<tr><td>'+customerDB[i].getCustomerId()+'</td> <td>'+customerDB[i].getCustomerName()+'</td> <td>'+customerDB[i].getCustomerAddress()+'</td> <td>'+customerDB[i].getCustomerContact()+'</td></tr>');
+                    }else if (resp.status==400){
+                        alert(resp.data)
+                    }else {
+                        resp.data()
                     }
-                })*/
-            }else {
-                alert("error")
-
             }
-        }
-
-
-/*         let obj=customerDB.findIndex((obj =>obj.getCustomerId()==id))
-        customerDB[obj].setCustomerName(txtCusName.val());
-        customerDB[obj].setCustomerAddress(txtCusAddress.val());
-        customerDB[obj].setCustomerContact(txtCusContact.val());*/
-        /*alert("Customer Have been Updated")*/
-           /* $("#tblCustomerTable tbody tr").filter(function() {
-                rowNoToUpdate = $(this).children("td:nth-child(1)").text();
-                if ($(this).children("td:nth-child(2)").text() == customerDB[obj].getCustomerId()) {
-                    $(this).replaceWith('<tr><td>'+customerDB[obj].getCustomerId()+'</td> <td>'+customerDB[obj].getCustomerName()+'</td> <td>'+customerDB[obj].getCustomerAddress()+'</td> <td>'+customerDB[obj].getCustomerContact()+'</td></tr>');
-                }
-            })*/
-       /* }else{
-            alert("error")
-        }
-*/
+        })
 
     });
    btnDeleteCustomer.click(function () {
+            let cusId = txtCusId.val();
 
-        alert("do you want to delete this customer");
-        let id=$('#txtCustomerId').val();
-        let obj=customerDB.findIndex((obj =>obj.id==id));
-        customerDB.splice(obj,1);
-        setDataToTable();
-        alert("Succesfully Deleted!.");
-        clearTextFields();
-        let i = generateCustomerId();
-        txtCusId.val(i);
-        console.log(obj);
-        console.log(customerDB);
+            $.ajax({
+                url:"http://localhost:8080/BackEnd_Web_exploded/customer?cusId="+cusId,
+                method:"DELETE",
+                success:function (resp) {
+                    if (resp.status==200){
+                        console.log(resp.message)
+                        alert(resp.message)
+                        setDataToTable();
+                    }else{
+                        console.log(resp.message)
+                        alert(resp.data)
+                    }
+
+                }
+            })
+
 
     });

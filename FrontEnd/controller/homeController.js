@@ -20,26 +20,65 @@ var btnClear=$('#btnClear')
 
 var orderCost=0;
 
-orderId.val(generateOrderId());
-    function generateOrderId() {
-        if (orderDB[0] != undefined) {
-            for (let i = 0; i < orderDB.length; i++) {
-                if (i == (orderDB.length - 1)) {
-                    let temp = parseInt(orderDB[i].getOrderId().split('-')[1]);
-                    temp = temp + 1;
-                    if (temp <= 9) {
-                        return "O00-00" + temp;
-                    } else if (temp <= 99) {
-                        return "O00-0" + temp;
-                    } else {
-                        return "O00-" + temp;
+
+        generateOrderId();
+        function generateOrderId() {
+            $.ajax({
+                url:"http://localhost:8080/BackEnd_Web_exploded/order?option=GENERATEID",
+                method:"GET",
+                success:function (resp) {
+                    if (resp.status==200){
+                        orderId.val(resp.id);
+
+                    }else {
+                        console.log("error")
                     }
+
                 }
-            }
-        } else {
-            return "O00-001";
+            });
         }
-    }
+
+        customerId.keydown(function (event) {
+            if (event.key=="Enter"){
+                let id = customerId.val();
+                $.ajax({
+                    url:"http://localhost:8080/BackEnd_Web_exploded/customer?option=SEARCH&cusId="+id,
+                    method:"GET",
+                    success: function (resp) {
+                        if (resp.status==200){
+                            customerId.val(resp.cusId);
+                            customerName.val(resp.cusName);
+                            customerAddress.val(resp.cusAddress);
+                            customerContact.val(resp.cusContact)
+                        }else {
+                            resp.data;
+                        }
+
+                    }
+                });
+            }
+
+        });
+        $("#txtitemId").keydown(function (event) {
+            if (event.key=="Enter"){
+                let id=ItemId.val();
+                $.ajax({
+                    url:"http://localhost:8080/BackEnd_Web_exploded/item?option=SEARCH&itemId="+id,
+                    method:"GET",
+                    success: function (resp) {
+                        if (resp.status==200){
+                            ItemId.val(resp.itemId);
+                            ItemName.val(resp.itemName);
+                            ItemPrice.val(resp.itemPrice);
+                            ItemQuantity.val(resp.itemQuantity)
+                        }else {
+                            resp.data;
+                        }
+                    }
+                });
+
+            }
+        });
 
     var AddToCartTm=new Array();
     $("#btnAddToCart").off("click")
@@ -131,54 +170,56 @@ orderId.val(generateOrderId());
     let time = dt.getHours() + "." + dt.getMinutes() + "." + dt.getSeconds();
     $('#btnPlaceOrder').off("click");
     $('#btnPlaceOrder').click(function () {
-        /*let cusId=$('input[name="txtcusId"]').val();
-        let itemId=$('input[name="txtitemId"]').val();
-        let orderId=$('input[name="txtorderId"]').val();
-        let discount=$('input[name="txtdis"]').val();
-        let quantity=$('input[name="txtOrderQuantity"]').val();
-        let total=$('input[name="txtttlPrice"]').val();
-        var orderObject={
-            orderId:orderId,
-            customerId:cusId,
-            itemId:itemId,
-            discount:discount,
-            quantity:quantity,
-            totalPrice:total
+
+        let order={
+            oId:orderId.val(),
+            cusId:customerId.val(),
+            discount:parseFloat(orderDiscount.val()),
+            totalPrice:parseFloat(labelTotal.val()),
+            date:date,
+            time:time,
+            orderDetails:AddToCartTm
+
         }
-        orderDB.push(orderObject);*/
-        var orderOBJ=new orderDTO(orderId.val(),customerId.val(),parseFloat(orderDiscount.val()),parseFloat(labelTotal.val()),date,time);
-          orderDB.push(orderOBJ);
-         for (let i=0;i<orderDB.length;i++){
-          if (orderDB[i].getOrderId()==orderId.val()){
-              for (let j=0;j<AddToCartTm.length;j++){
-                  orderDB[i].getOrderDetails().push(new OrderDetails(AddToCartTm[j].getOOderId(),
-                      AddToCartTm[j].getOOrderCustomerId(),AddToCartTm[j].getOOrderItemId(),
-                      AddToCartTm[j].getOOrderDiscount(),AddToCartTm[j].getOOrderQuantity(),
-                      AddToCartTm[j].getOOrderTotalPrice()));
+        $.ajax({
+            url:"http://localhost:8080/BackEnd_Web_exploded/order",
+            method: "POST",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify(order),
+            success:function (resp) {
+                if (resp.status==200){
+                   alert(resp.message)
+                    customerId.val("");
+                    customerName.val("");
+                    customerAddress.val("");
+                    customerContact.val("");
 
-              };
-              alert("Your order is Placed")
-              customerId.val("");
-              customerName.val("");
-              customerAddress.val("");
-              customerContact.val("");
+                    ItemId.val("");
+                    ItemName.val("");
+                    ItemPrice.val("");
+                    ItemQuantity.val("");
 
-              ItemId.val("");
-              ItemName.val("");
-              ItemPrice.val("");
-              ItemQuantity.val("");
+                    orderDiscount.val("");
+                    orderQuantity.val("");
+                    totalPrice.val("");
 
-              orderDiscount.val("");
-              orderQuantity.val("");
-              totalPrice.val("");
-          }else{
-              alert("order isn't placed.....")
-          }
-         };
-         itemQuantity();
-         $("#tablehome tbody tr").remove();
-         orderCost=0;
-         labelTotal.val(orderCost);
+
+
+                    $("#tablehome tbody tr").remove();
+                    orderCost=0;
+                    labelTotal.val(orderCost);
+
+                }else {
+                    alert(resp.data)
+                }
+
+            }
+
+        })
+
+
+
 
 
 
@@ -191,40 +232,8 @@ orderId.val(generateOrderId());
         $("#tblAddOrder").append(tr);
     }
 }
-    $("#txtcusId").keydown(function (event) {
-        if (event.key=="Enter"){
-            let id= $('#txtcusId').val();
-            let cusDetails=searchCustomer(id);
-            if (cusDetails){
-                $('#txtOrderCusName').val(cusDetails.getCustomerName());
-                $('#txtOrderCusAddress').val(cusDetails.getCustomerAddress());
-                $('#txtOrderCusContact').val(cusDetails.getCustomerContact());
 
 
-            }
-
-        }
-    });
-    $("#txtitemId").keydown(function (event) {
-        if (event.key=="Enter"){
-            let id= $('#txtitemId').val();
-            let itemDetails=searchItem(id);
-            if (itemDetails){
-                $('#txtOrderItemName').val(itemDetails.getItemName());
-                $('#txtOrderItemPrice').val(itemDetails.getItemPrice());
-                $('#txtOrderItemQuantity').val(itemDetails.getItemQuantity());
-            }
-
-        }
-    });
-    function searchCustomer(id) {
-        for (let i=0;i<customerDB.length;i++){
-            if (customerDB[i].getCustomerId()==id){
-                return customerDB[i];
-            }
-        }
-
-    }
     orderQuantity.keydown(function (event) {
         if (event.key=="Enter"){
             let customerQuantity=parseInt(orderQuantity.val());
@@ -262,7 +271,7 @@ $(document).ready(function () {
     });
 });
 
-    function itemQuantity() {
+    /*function itemQuantity() {
         for (let i=0;i<orderDB.length;i++){
             for (let j=0;j<orderDB[i].getOrderDetails().length;j++){
                 let itemId=orderDB[i].getOrderDetails()[j].getOOrderItemId();
@@ -276,7 +285,7 @@ $(document).ready(function () {
                  }
             }
         }
-    }
+    }*/
     var regExCusID=/^(C00-)[0-9]{3,4}$/;
     customerId.keyup(function () {
 

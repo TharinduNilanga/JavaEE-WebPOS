@@ -13,57 +13,94 @@ txtItemId.val(generateItemId());
 
 
 
+    //generateItemId();
     function generateItemId() {
-        if (itemDB[0] != undefined) {
-            for (let i = 0; i < itemDB.length; i++) {
-                if (i == (itemDB.length - 1)) {
-                    let temp = parseInt(itemDB[i].getItemId().split('-')[1]);
-                    temp = temp + 1;
-                    if (temp <= 9) {
-                        return "I00-00" + temp;
-                    } else if (temp <= 99) {
-                        return "I00-0" + temp;
-                    } else {
-                        return "I00-" + temp;
-                    }
+        $.ajax({
+            url:"http://localhost:8080/BackEnd_Web_exploded/item?option=GENERATEID",
+            method:"GET",
+            success:function (resp) {
+
+                if (resp.status==200){
+                    console.log(resp.itemId)
+                   txtItemId.val(resp.itemId)
+                    clearItemTextFields()
+                }else {
+                    alert(resp.data)
                 }
+
             }
-        } else {
-            return "I00-001";
-        }
+        })
     }
-    $("#btnItemSave").click(function () {
-        for (let i = 0; i < itemDB.length; i++) {
-            if (itemDB[i].getItemId() == txtItemId.val()) {
-                alert('This Id is Exists.Enter Different..');
-                clearItemTextFields();
-                txtItemId.val(generateItemId());
-                return;
+  btnSaveItem.click(function () {
+    let itemDetails={
+        id:txtItemId.val(),
+        name:txtItemName.val(),
+        price:txtItemPrice.val(),
+        qty:txtItemQuantity.val()
+    }
+        $.ajax({
+            url:"http://localhost:8080/BackEnd_Web_exploded/item",
+            method: "POST",
+            data:JSON.stringify(itemDetails),
+            content:"application/json",
+            dataType:"json",
+            success:function (resp) {
+                if (resp.status==200){
+                    alert(resp.message);
+                    setItemDataToTable();
+                    generateItemId();
+
+                }else{
+                    alert(resp.data)
+                }
+
             }
-        }
-           if (itemDB.push(new itemDTO(txtItemId.val(),txtItemName.val(),txtItemPrice.val(),txtItemQuantity.val()))){
-               alert("Item has been added succesfully");
-               clearItemTextFields();
-               txtItemId.val(generateItemId());
-               setItemDataToTable();
-               $('#btnItemSave').prop('disabled', true);
-           }else{
-               alert("Item doesn't added!..")
-           }
+        })
+
+
         });
     function clearItemTextFields(){
-        $('#txtitemidnew').val("");
+       // $('#txtitemidnew').val("");
         $('#txtItemName').val("");
         $('#txtItemPrice').val("");
         $('#txtItemQuantity').val("");
     };
+    setItemDataToTable();
      function setItemDataToTable(){
-         $("#tblItemTable tbody tr").remove();
-         for (let i=0;i<itemDB.length;i++){
-             var tr='<tr><td>'+itemDB[i].getItemId()+'</td> <td>'+itemDB[i].getItemName()+'</td> <td>'+itemDB[i].getItemPrice()+'</td> <td>'+itemDB[i].getItemQuantity()+'</td></tr>';
-             $("#tblItemTable").append(tr);
-         }
+         $("#tblItem tbody tr").remove();
+         $.ajax({
+             url: "http://localhost:8080/BackEnd_Web_exploded/item?option=GETALL",
+             method: "GET",
+             // dataType:"json", // please convert the response into JSON
+             success: function (resp) {
+
+                 console.log(typeof resp);
+
+                 for (const item of resp.data) {
+                     let row='<tr><td>'+item.id+'</td><td>'+item.name+'</td><td>'+item.price+'</td><td>'+item.qty+'</td></tr>';
+                     $("#tblItem").append(row);
+                 }
+                 bindClickEvents();
+             }
+         });
      }
+
+        function bindClickEvents() {
+            $("#tblItem>tr").click(function () {
+                //Get values from the selected row
+                let id = $(this).children().eq(0).text();
+                let name = $(this).children().eq(1).text();
+                let address = $(this).children().eq(2).text();
+                let contact = $(this).children().eq(3).text();
+
+                //Set values to the text-fields
+
+               txtItemId.val(id);
+                txtItemName.val(name);
+                txtItemPrice.val(address);
+                txtItemQuantity.val(contact);
+            });
+        }
 /*        $(document).ready(function () {
             $(document).on('click','#tblItemTable tbody tr',function () {
                 var itemId=$(this).find('td:eq(0)').text();
@@ -210,47 +247,54 @@ txtItemId.val(generateItemId());
             }
         })
         function searchItem(id) {
-            for (let i=0;i<itemDB.length;i++){
-                if (itemDB[i].getItemId()==id){
-                    return itemDB[i];
+            $.ajax({
+                url:"http://localhost:8080/BackEnd_Web_exploded/item?option=SEARCH?cusId="+id,
+                method:"SEARCH",
+                success: function (resp) {
+                    var details=resp.cusId;
+                    return details;
                 }
-            }
+            });
 
         }
         $("#btnUpdateItem").click(function () {
-           /* let id=$("#txtitemidnew").val();
-            let iName=$('input[name="txtItemName"]').val();
-            let iPrice=$('input[name="txtItemPrice"]').val();
-            let iQuantity=$('input[name="txtItemQuantity"]').val();
-
-            let objItem=itemDB.findIndex((obj =>obj.id==id));
-            itemDB[objItem].name=iName;
-            itemDB[objItem].price=iPrice;
-            itemDB[objItem].quantity=iQuantity;*/
-                for (let i=0;i<itemDB.length;i++){
-                    if (itemDB[i].getItemId()==txtItemId.val()){
-                        itemDB[i].setItemName(txtItemName.val());
-                        itemDB[i].setItemPrice(txtItemPrice.val());
-                        itemDB[i].setItemQuantity(txtItemQuantity.val());
-
-                        alert("Item deails has been added succesfully!..")
-                        setItemDataToTable();
-                        clearItemTextFields();
-                        txtItemId.val(generateItemId());
-                    }else{
-                        alert("Error");
-                    }
+         let itemOb={
+             id:txtItemId.val(),
+             name:txtItemName.val(),
+             price: txtItemPrice.val(),
+             qty:txtItemQuantity.val()
+         }
+         $.ajax({
+             url:"http://localhost:8080/BackEnd_Web_exploded/item",
+             method:"PUT",
+             contentType:"application/json",
+             data: JSON.stringify(itemOb),
+             dataType: "json",
+             success:function (resp) {
+                if (resp.status==200){
+                    alert(resp.message)
+                    setItemDataToTable()
+                    clearItemTextFields()
+                    generateItemId()
+                }else if (resp.status==400){
+                    alert(resp.data)
+                }else {
+                    resp.data()
                 }
+             }
+         })
         });
         $("#btnDeleteItem").click(function () {
-            alert("do you want to delete this customer");
-            let id=$('#txtitemidnew').val();
-            let obj=itemDB.findIndex((obj =>obj.getItemId()==id));
-            itemDB.splice(obj,1);
-            setItemDataToTable();
-            alert("Succesfully deleted!..");
-            clearItemTextFields();
-            txtItemId.val(generateItemId());
-            itemDB.log(obj);
-            itemDB.log(itemDB);
+            let itemId=txtItemId.val();
+            $.ajax({
+                url:"http://localhost:8080/BackEnd_Web_exploded/item?itemId="+itemId,
+                method:"DELETE",
+                success:function (resp) {
+                    if (resp.status==200){
+                        alert(resp.message)
+                    }else {
+                        alert(resp.data)
+                    }
+                }
+            })
         });

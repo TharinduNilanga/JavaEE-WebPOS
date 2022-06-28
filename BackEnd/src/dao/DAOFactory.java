@@ -1,9 +1,6 @@
 package dao;
 
-import dao.custom.impl.CustomerDAOImpl;
-import dao.custom.impl.ItemDAOImpl;
-import dao.custom.impl.OrderDAOImpl;
-import dao.custom.impl.OrderDetailsDAOImpl;
+import dao.custom.impl.*;
 
 /**
  * @author Tharindu Nilanga
@@ -34,7 +31,7 @@ public class DAOFactory {
             case ORDERDETAILS:
                 return new OrderDetailsDAOImpl();
             case SIGNUP:
-                return new CustomerDAOImpl();
+                return new SignUpDAOImpl();
             default:
                 return null;
         }
